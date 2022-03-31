@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <iterator>
 namespace Util {
-    std::map<int, Value> compact(const std::vector<std::map<int, Value> > &inputs) {
+    inline std::map<int, Value> compact(const std::vector<std::map<int, Value> > &inputs) {
         size_t n = inputs.size();
         std::map<int, Value> ret;
         std::vector<size_t> poses(n);
