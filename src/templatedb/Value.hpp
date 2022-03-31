@@ -2,7 +2,6 @@
 #define VALUE_H
 
 #include <vector>
-#include <boost/serialization/vector.hpp>
 
 class Value
 {
