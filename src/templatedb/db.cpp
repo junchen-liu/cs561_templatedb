@@ -1,4 +1,4 @@
-#include "templatedb/db.hpp"
+#include "db.hpp"
 #include "Option.hpp"
 
 using namespace templatedb;

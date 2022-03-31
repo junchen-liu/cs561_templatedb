@@ -3,8 +3,25 @@ project(templatedb VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 11)
 
 set(templatedb_lib
+    src/templatedb/db.hpp
+    src/templatedb/operation.hpp
+    src/templatedb/DiskStorage.hpp
+    src/templatedb/LevelNonZero.hpp
+    src/templatedb/LevelZero.hpp
+    src/templatedb/Option.hpp
+    src/templatedb/SearchResult.hpp
+    src/templatedb/SSTable.hpp
+    src/templatedb/SSTableId.hpp
+    src/templatedb/Util.hpp
+    src/templatedb/Value.hpp
     src/templatedb/db.cpp
     src/templatedb/operation.cpp
+    src/templatedb/DiskStorage.cpp
+    src/templatedb/LevelNonZero.cpp
+    src/templatedb/LevelZero.cpp
+    src/templatedb/SearchResult.cpp
+    src/templatedb/SSTable.cpp
+    src/templatedb/SSTableId.cpp
 )
 
 set(bloomfilter_lib

@@ -1,13 +1,14 @@
 #include "LevelNonZero.hpp"
-#include "Util.h"
+#include "Util.hpp"
 #include "SSTableId.hpp"
 #include "Value.hpp"
 #include <filesystem>
 #include <fstream>
 
+
 LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
-    if (!std::filesystem::exists(std::filesystem::path(dir))) {
-        std::filesystem::create_directories(std::filesystem::path(dir));
+    if (!std::__fs::filesystem::exists(std::__fs::filesystem::path(dir))) {
+        std::__fs::filesystem::create_directories(std::__fs::filesystem::path(dir));
         size = 0;
         byteCnt = 0;
         lastKey = 0;
@@ -21,7 +22,7 @@ LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
         for (uint64_t i = 0; i < size; ++i) {
             uint64_t no;
             ifs.read((char*) &no, sizeof(uint64_t));
-            ssts.emplace_back(SSTableId(dir, no), tableCache);
+            ssts.emplace_back(SSTableId(dir, no));
         }
         ifs.close();
     }
@@ -38,12 +39,12 @@ SearchResult LevelNonZero::search(uint64_t key) const {
 
 std::map<int, Value> LevelNonZero::extract() {
     auto itr = ssts.begin();
-    while (itr != ssts.end() && itr->rbegin()->first <= lastKey)
+    while (itr != ssts.end() && itr->load().rbegin()->first <= lastKey)
         ++itr;
     if (itr == ssts.end())
         itr = ssts.begin();
     byteCnt -= itr->getSpace();
-    lastKey = itr->rbegin()->first;
+    lastKey = itr->load().rbegin()->first;
     std::map<int, Value> ret = itr->load();
     itr->remove();
     ssts.erase(itr);
@@ -57,9 +58,9 @@ void LevelNonZero::merge(std::map<int, Value> &&entries1, uint64_t &no) {
     uint64_t hi = entries1.rbegin()->first;
     std::map<int, Value> entries0;
     auto itr = ssts.begin();
-    while (itr != ssts.end() && itr->rbegin()->first < lo)
+    while (itr != ssts.end() && itr->load().rbegin()->first < lo)
         ++itr;
-    while (itr != ssts.end() && itr->begin()->first <= hi) {
+    while (itr != ssts.end() && itr->load().begin()->first <= hi) {
         std::map<int, Value> loadmap = itr->load();
         entries0.insert(loadmap.begin(), loadmap.end());
         byteCnt -= itr->getSpace();
@@ -67,11 +68,14 @@ void LevelNonZero::merge(std::map<int, Value> &&entries1, uint64_t &no) {
         itr = ssts.erase(itr);
         --size;
     }
-    std::map<int, Value> entries = Util::compact({entries0, entries1});
+    std::vector<std::map<int, Value>> v;
+    v.emplace_back(entries0);
+    v.emplace_back(entries1);
+    std::map<int, Value> entries = Util::compact(v);
     size_t n = entries.size();
     size_t pos = 0;
     while (pos < n) {
-        byteCnt += ssts.emplace(itr, entries, SSTableId(dir, no++))->space();
+        byteCnt += ssts.emplace(itr, entries, SSTableId(dir, no++))->getSpace();
         ++size;
     }
     save();

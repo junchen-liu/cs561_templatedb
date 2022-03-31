@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 #include "DiskStorage.hpp"
-#include "templatedb/operation.hpp"
+#include "operation.hpp"
 #include "Value.hpp"
 
 namespace templatedb

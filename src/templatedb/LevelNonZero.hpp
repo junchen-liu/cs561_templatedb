@@ -2,10 +2,12 @@
 #define LEVEL_NON_ZERO_H
 
 #include "SearchResult.hpp"
+#include "SSTable.hpp"
 #include <string>
 #include <cstdint>
 #include <vector>
 #include <list>
+#include <map>
 
 class LevelNonZero {
 public:
@@ -20,7 +22,7 @@ private:
     uint64_t size;
     uint64_t byteCnt;
     uint64_t lastKey;
-    SSTable table;
+    std::list<SSTable> ssts;
     void save() const;
 };
 

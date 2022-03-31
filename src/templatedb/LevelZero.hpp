@@ -9,7 +9,7 @@
 
 class LevelZero {
 public:
-    explicit LevelZero(const std::string &di);
+    explicit LevelZero(const std::string &dir);
     SearchResult search(uint64_t key) const;
     void add(const std::map<int, Value> &mem, uint64_t &no);
     std::map<int, Value> extract();
@@ -19,7 +19,7 @@ private:
     std::string dir;
     uint64_t size;
     uint64_t byteCnt;
-    SSTable table;
+    std::vector<SSTable> ssts;
     void save() const;
 };
 

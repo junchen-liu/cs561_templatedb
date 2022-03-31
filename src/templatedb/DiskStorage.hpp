@@ -13,7 +13,7 @@
 
 class DiskStorage {
 public:
-    explicit DiskStorage();
+    explicit DiskStorage(): DiskStorage("./diskdata") {}
     explicit DiskStorage(const std::string &dir);
     void add(const std::map<int, Value> &mem);
     Value search(int key);

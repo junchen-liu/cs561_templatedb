@@ -21,21 +21,21 @@ namespace Util {
         int key = INT_MAX;
         for (size_t i = 0; i < n; ++i)
             if (poses[i] < inputs[i].size()) {
-                auto it = inputs[i].begin()
-                std::advance(it, poses[i])
+                auto it = inputs[i].begin();
+                std::advance(it, poses[i]);
                 key = std::min(key, it->first);
             }
         Value value;
         for (size_t i = 0; i < n; ++i) {
-            auto it = inputs[i].begin()
-            std::advance(it, poses[i])
+            auto it = inputs[i].begin();
+            std::advance(it, poses[i]);
             if (poses[i] < inputs[i].size() && it->first == key) {
                 value = it->second;
                 if (poses[i] == inputs[i].size())
                     --nonEmpty;
             }
         }
-        ret.emplace(key, value);
+        ret.emplace(std::make_pair(key, value));
     }
     return ret;
     }

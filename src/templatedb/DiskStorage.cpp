@@ -5,23 +5,8 @@
 #include <filesystem>
 #include <fstream>
 
-DiskStorage::DiskStorage(const std::string &dir) {
-    dir = "./diskdata";
-    level0(dir + Option::Z_NAME);
-    if (std::filesystem::exists(std::filesystem::path(dir + "/meta"))) {
-        std::ifstream ifs(dir + "/meta", std::ios::binary);
-        ifs.read((char*) &no, sizeof(uint64_t));
-        ifs.close();
-    } else {
-        no = 0;
-        save();
-    }
-    for (uint64_t i = 0; i < Option::NZ_NUM; ++i)
-        levels.emplace_back(dir + Option::NZ_NAMES[i]);
-}
-
 DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option::Z_NAME) {
-    if (std::filesystem::exists(std::filesystem::path(dir + "/meta"))) {
+    if (std::__fs::filesystem::exists(std::__fs::filesystem::path(dir + "/meta"))) {
         std::ifstream ifs(dir + "/meta", std::ios::binary);
         ifs.read((char*) &no, sizeof(uint64_t));
         ifs.close();
@@ -34,7 +19,7 @@ DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option:
 }
 
 void DiskStorage::add(const std::map<int, Value> &mem) {
-    level0.add(mem, no);
+    level0.add(mem, no); 
     //Compaction
     if (level0.space() > Option::Z_SPACE){
         levels[0].merge(level0.extract(), no);

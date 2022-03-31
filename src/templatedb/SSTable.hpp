@@ -16,7 +16,7 @@ public:
     std::map<int, Value> load() const;
     int getSpace() const;
     void remove() const;
-    void number() const;
+    uint64_t number() const;
 
 private:
     SSTableId sstbId;

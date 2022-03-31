@@ -61,11 +61,11 @@ int SSTable::getSpace() const {
 }
 
 void SSTable::remove() const {
-    std::filesystem::remove(std::filesystem::path(id.name()));
+    std::__fs::filesystem::remove(std::__fs::filesystem::path(sstbId.name()));
 }
 
 uint64_t SSTable::number() const {
-    return id.no;
+    return sstbId.no;
 }
 
 void SSTable::save(const std::map<int, Value> &entries) {
