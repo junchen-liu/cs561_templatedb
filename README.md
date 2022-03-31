@@ -27,7 +27,7 @@ To compile, first create a build directory.
 
 
 ```bash
-mkdir build
+build build
 cd build
 ```
 

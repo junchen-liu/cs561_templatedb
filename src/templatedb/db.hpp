@@ -8,9 +8,9 @@
 #include <sstream>
 #include <map>
 #include <vector>
-#include "DiskStorage.hpp"
 #include "templatedb/operation.hpp"
 #include "Value.hpp"
+#include "Disk.h"
 
 namespace templatedb
 {
@@ -52,7 +52,8 @@ private:
     std::fstream file;
     std::map<int, Value> table;
     size_t value_dimensions = 0;
-    DiskStorage disk;
+//    DiskStorage disk;
+    Disk disk;
     bool write_to_file();
 };
 
