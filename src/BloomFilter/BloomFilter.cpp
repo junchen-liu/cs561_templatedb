@@ -63,5 +63,5 @@ int BloomFilter::getIndexNum(){
 }
 
 int BloomFilter::getSize(){
-	return size;
+	return size + 1;
 }

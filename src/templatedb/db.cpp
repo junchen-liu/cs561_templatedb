@@ -1,20 +1,29 @@
 #include "templatedb/db.hpp"
+#include "Option.hpp"
 
 using namespace templatedb;
 
-
+DB::DB(const std::string &dir): disk(dir) {}
 Value DB::get(int key)
 {
-    if (table.count(key))
+    if (table.count(key)){
         return table[key];
-    
-    return Value(false);
+    }
+
+    Value result = disk.search(key);
+	return result;
+    //return Value(false);
 }
 
 
 void DB::put(int key, Value val)
 {
     table[key] = val;
+    if (table.size() > Option::SST_SPACE) {
+		disk.add(table);
+		table.clear();
+	}
+
 }
 
 
@@ -45,7 +54,14 @@ std::vector<Value> DB::scan(int min_key, int max_key)
 
 void DB::del(int key)
 {
-    table.erase(key);
+    if (table.count(key))
+        table.erase(key);
+    else {
+        Value result = this->get(key);
+        result.visible = false;
+        this->put(key,result);
+    }
+    
 }
 
 

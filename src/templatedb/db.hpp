@@ -6,10 +6,11 @@
 #include <iterator>
 #include <string>
 #include <sstream>
-#include <unordered_map>
+#include <map>
 #include <vector>
-
+#include "DiskStorage.hpp"
 #include "templatedb/operation.hpp"
+#include "Value.hpp"
 
 namespace templatedb
 {
@@ -22,21 +23,6 @@ typedef enum _status_code
 } db_status;
 
 
-class Value
-{
-public:
-    std::vector<int> items;
-    bool visible = true;
-
-    Value() {}
-    Value(bool _visible) {visible = _visible;}
-    Value(std::vector<int> _items) { items = _items;}
-
-    bool operator ==(Value const & other) const
-    {
-        return (visible == other.visible) && (items == other.items);
-    }
-};
 
 
 class DB
@@ -44,7 +30,7 @@ class DB
 public:
     db_status status;
 
-    DB() {};
+    explicit DB(const std::string &dir);
     ~DB() {close();};
 
     Value get(int key);
@@ -64,9 +50,9 @@ public:
 
 private:
     std::fstream file;
-    std::unordered_map<int, Value> table;
+    std::map<int, Value> table;
     size_t value_dimensions = 0;
-    
+    DiskStorage disk;
     bool write_to_file();
 };
 
