@@ -1,8 +1,9 @@
 #ifndef VALUE_H
 #define VALUE_H
 
-
 #include <vector>
+#include <boost/serialization/vector.hpp>
+
 class Value
 {
 public:
@@ -10,8 +11,8 @@ public:
     bool visible = true;
 
     Value() {}
-    Value(bool _visible) {visible = _visible;}
-    Value(std::vector<int> _items) { items = _items;}
+    Value(bool _visible);
+    Value(std::vector<int> _items);
 
     bool operator ==(Value const & other) const
     {

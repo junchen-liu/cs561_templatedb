@@ -4,11 +4,10 @@
 #include "SearchResult.hpp"
 #include "Value.hpp"
 #include "SSTableId.hpp"
-#include <map>
+#include <boost/serialization/map.hpp>
 #include <string>
 #include <vector>
-#include <cstdint>
-#include <cstddef>
+#include <map>
 
 class SSTable {
 public:

@@ -2,6 +2,7 @@
 #define SEARCH_RESULT_H
 
 #include <string>
+#include "Value.hpp"
 
 struct SearchResult {
     bool success;

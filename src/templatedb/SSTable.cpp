@@ -1,12 +1,15 @@
 #include "SSTable.hpp"
-#include "Util.hpp"
-#include "Option.hpp"
 #include <fstream>
 #include <filesystem>
+#include <vector>
+
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 using std::ofstream;
 using std::ifstream;
-#include <boost/archive/text_oarchive.hpp> 
-#include <boost/archive/text_iarchive.hpp> 
 
 
 SSTable::SSTable(const SSTableId &id)
@@ -31,10 +34,24 @@ SearchResult SSTable::search(int key) const {
 
 std::map<int, Value> SSTable::load() const {
     std::map<int, Value> entries;
-    std::ifstream file(sstbId.name()); 
-    boost::archive::text_iarchive ia(file); 
-    ia >> entries; 
-    space <- entries.size();
+    ifstream file(sstbId.name());
+
+    std::string line, item, op_string, key_str;
+    while (std::getline(file, line))
+    {
+        std::vector<int> items = std::vector<int>();
+
+        std::stringstream linestream(line);
+        std::getline(linestream, key_str, ' '); // First argument is a key
+        int key = stoi(key_str);
+        while(std::getline(linestream, item, ' '))
+        {
+            items.push_back(stoi(item));
+        }
+        Value v = Value(items);
+        entries[key] = v;
+        // std::cout << key << std::endl;
+    }
     return entries;
 }
 
@@ -45,11 +62,11 @@ int SSTable::getSpace() const {
 
 void SSTable::save(const std::map<int, Value> &entries) {
     std::ofstream file(sstbId.name());
-
-    // save data to archive
-    boost::archive::text_oarchive oa(file);
-    // write map instance to archive
-    oa << entries;
-    // archive and stream closed when destructors are called
-
+    for (const auto &i : entries) {
+        file << i.first << ' ';
+        for (const auto &j : i.second.items){
+            file << j<< ' ';
+        }
+        file << std::endl;
+    }
 }

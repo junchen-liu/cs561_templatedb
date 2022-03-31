@@ -2,13 +2,12 @@
 #define SSTABLE_ID_H
 
 #include <string>
-#include <cstdint>
 
 struct SSTableId {
     std::string dir;
-    uint64_t no;
+    int no;
     SSTableId() = default;
-    SSTableId(const std::string &dir, uint64_t no);
+    SSTableId(const std::string &dir, int no);
     std::string name() const;
 };
 
