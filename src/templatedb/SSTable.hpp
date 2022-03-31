@@ -4,7 +4,6 @@
 #include "SearchResult.hpp"
 #include "Value.hpp"
 #include "SSTableId.hpp"
-#include <boost/serialization/map.hpp>
 #include <string>
 #include <vector>
 #include <map>
@@ -16,6 +15,8 @@ public:
     SearchResult search(int key) const;
     std::map<int, Value> load() const;
     int getSpace() const;
+    void remove() const;
+    void number() const;
 
 private:
     SSTableId sstbId;

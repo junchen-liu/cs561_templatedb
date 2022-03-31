@@ -3,7 +3,7 @@
 
 using namespace templatedb;
 
-DB::DB(const std::string &dir): disk(dir) {}
+DB::DB() {}
 Value DB::get(int key)
 {
     if (table.count(key)){
@@ -19,7 +19,7 @@ Value DB::get(int key)
 void DB::put(int key, Value val)
 {
     table[key] = val;
-    if (table.size() > Option::SST_SPACE) {
+    if (table.size() >= Option::SST_SPACE) {
 		disk.add(table);
 		table.clear();
 	}

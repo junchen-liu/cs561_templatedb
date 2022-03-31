@@ -19,7 +19,7 @@ private:
     std::string dir;
     uint64_t size;
     uint64_t byteCnt;
-    std::vector<SSTable> ssts;
+    SSTable table;
     void save() const;
 };
 

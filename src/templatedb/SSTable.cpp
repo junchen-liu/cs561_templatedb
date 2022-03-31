@@ -60,6 +60,14 @@ int SSTable::getSpace() const {
     return space;
 }
 
+void SSTable::remove() const {
+    std::filesystem::remove(std::filesystem::path(id.name()));
+}
+
+uint64_t SSTable::number() const {
+    return id.no;
+}
+
 void SSTable::save(const std::map<int, Value> &entries) {
     std::ofstream file(sstbId.name());
     for (const auto &i : entries) {

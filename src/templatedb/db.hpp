@@ -30,7 +30,7 @@ class DB
 public:
     db_status status;
 
-    explicit DB(const std::string &dir);
+    explicit DB();
     ~DB() {close();};
 
     Value get(int key);

@@ -5,6 +5,20 @@
 #include <filesystem>
 #include <fstream>
 
+DiskStorage::DiskStorage(const std::string &dir) {
+    dir = "./diskdata";
+    level0(dir + Option::Z_NAME);
+    if (std::filesystem::exists(std::filesystem::path(dir + "/meta"))) {
+        std::ifstream ifs(dir + "/meta", std::ios::binary);
+        ifs.read((char*) &no, sizeof(uint64_t));
+        ifs.close();
+    } else {
+        no = 0;
+        save();
+    }
+    for (uint64_t i = 0; i < Option::NZ_NUM; ++i)
+        levels.emplace_back(dir + Option::NZ_NAMES[i]);
+}
 
 DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option::Z_NAME) {
     if (std::filesystem::exists(std::filesystem::path(dir + "/meta"))) {
