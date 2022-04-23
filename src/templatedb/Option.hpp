@@ -7,7 +7,7 @@ namespace Option {
     const bool COMPRESSION = true;
     const bool COMPACTION = true;
     const bool BLOCK_CACHE = true;
-    const uint64_t SST_SPACE = (uint64_t) 2 * 1024 * 1024;
+    const uint64_t SST_SPACE = (uint64_t) 2;
     const uint64_t BLOCK_SPACE = (uint64_t) 4 * 1024;
     const uint64_t BLOCK_CACHE_SPACE = (uint64_t) 2 * 1024 * 1024;
     const uint64_t NZ_NUM = 3;

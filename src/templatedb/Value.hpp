@@ -3,8 +3,7 @@
 
 #include <vector>
 
-class Value
-{
+class Value {
 public:
     std::vector<int> items;
     bool visible = true;

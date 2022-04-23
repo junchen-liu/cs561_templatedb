@@ -3,16 +3,13 @@
 
 using namespace templatedb;
 
-DB::DB() {}
 Value DB::get(int key)
 {
     if (table.count(key)){
         return table[key];
     }
-
     Value result = disk.search(key);
 	return result;
-    //return Value(false);
 }
 
 
@@ -35,6 +32,7 @@ std::vector<Value> DB::scan()
         return_vector.push_back(pair.second);
     }
 
+
     return return_vector;
 }
 
@@ -46,6 +44,13 @@ std::vector<Value> DB::scan(int min_key, int max_key)
     {
         if ((pair.first >= min_key) && (pair.first <= max_key))
             return_vector.push_back(pair.second);
+    }
+
+    for (int i = min_key; i <= max_key; ++i)
+    {
+        Value res = disk.search(i);
+        if (res.visible)
+            return_vector.push_back(res);
     }
 
     return return_vector;

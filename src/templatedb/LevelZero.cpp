@@ -23,13 +23,13 @@ LevelZero::LevelZero(const std::string &dir): dir(dir){
     }
 }
 
-SearchResult LevelZero::search(uint64_t key) const {
+Value LevelZero::search(uint64_t key) const {
     for (uint64_t i = 1; i <= size; ++i) {
-        SearchResult res = ssts[size - i].search(key);
-        if (res.success)
+        Value res = ssts[size - i].search(key);
+        if (res.visible)
             return res;
     }
-    return false;
+    return Value(false);
 }
 
 void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {

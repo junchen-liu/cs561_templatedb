@@ -1,6 +1,5 @@
 #ifndef LEVEL_ZERO_H
 #define LEVEL_ZERO_H
-#include "SearchResult.hpp"
 #include "Value.hpp"
 #include "SSTable.hpp"
 #include <string>
@@ -10,7 +9,7 @@
 class LevelZero {
 public:
     explicit LevelZero(const std::string &dir);
-    SearchResult search(uint64_t key) const;
+    Value search(uint64_t key) const;
     void add(const std::map<int, Value> &mem, uint64_t &no);
     std::map<int, Value> extract();
     void clear();

@@ -1,9 +1,11 @@
 #include "DiskStorage.hpp"
-#include "SearchResult.hpp"
 //#include "Util.h"
 #include "Option.hpp"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+
+DiskStorage::DiskStorage() : DiskStorage("./diskdata") {}
 
 DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option::Z_NAME) {
     if (std::__fs::filesystem::exists(std::__fs::filesystem::path(dir + "/meta"))) {
@@ -32,10 +34,12 @@ void DiskStorage::add(const std::map<int, Value> &mem) {
 }
 
 Value DiskStorage::search(int key) {
-    SearchResult searchResult = level0.search(key);
-    for (uint64_t i = 0; !searchResult.success && i < Option::NZ_NUM; ++i)
-        searchResult = levels[i].search(key);
-    return searchResult.value;
+    Value searchResult = level0.search(key);
+    std::cout << searchResult.visible << std::endl;
+    if (!searchResult.visible)
+        for (uint64_t i = 0; !searchResult.visible && i < Option::NZ_NUM; ++i)
+            searchResult = levels[i].search(key);
+    return searchResult;
 }
 
 void DiskStorage::clear() {

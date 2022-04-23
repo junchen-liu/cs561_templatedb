@@ -22,15 +22,12 @@ typedef enum _status_code
     ERROR_OPEN = 100,
 } db_status;
 
-
-
-
 class DB
 {
 public:
     db_status status;
 
-    explicit DB();
+    DB() {}
     ~DB() {close();};
 
     Value get(int key);

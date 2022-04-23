@@ -22,14 +22,13 @@ SSTable::SSTable(const std::map<int, Value> &entries, const SSTableId &id)
 }
 
 
-SearchResult SSTable::search(int key) const {
+Value SSTable::search(int key) const {
     std::map<int, Value> entries = load();
-    SearchResult searchResult = SearchResult(false);
-    if (entries.count(key)){
-        searchResult.value = entries[key];
-        searchResult.success = true;
+    if (entries.count(key)) {
+        std::cout << "Found" << std::endl;
+        return entries[key];
     }
-    return searchResult;
+    return Value(false);
 }
 
 std::map<int, Value> SSTable::load() const {

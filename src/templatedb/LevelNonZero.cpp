@@ -28,13 +28,13 @@ LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
     }
 }
 
-SearchResult LevelNonZero::search(uint64_t key) const {
+Value LevelNonZero::search(uint64_t key) const {
     for (const SSTable &sst : ssts) {
-        SearchResult res = sst.search(key);
-        if (res.success)
+        Value res = sst.search(key);
+        if (res.visible)
             return res;
     }
-    return false;
+    return Value(false);
 }
 
 std::map<int, Value> LevelNonZero::extract() {
