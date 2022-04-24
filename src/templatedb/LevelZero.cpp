@@ -1,6 +1,7 @@
 #include "LevelZero.hpp"
 #include "Value.hpp"
 #include "Util.hpp"
+#include "Option.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -30,27 +31,49 @@ Value LevelZero::search(uint64_t key) const {
         if (res.visible)
             return res;
     }
-    return Value(false);
+    return {false};
 }
 
 void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
-    ssts.emplace_back(mem, SSTableId(dir, no++));
-    ++size;
-    byteCnt += mem.size();
+    if (Option::LEVELING) {
+        if (size) {
+            std::map<int, Value> entries = ssts[0].load();
+            std::vector<std::map<int, Value>> v;
+            v.emplace_back(entries);
+            v.emplace_back(mem);
+            clear();
+            ssts.push_back(SSTable(Util::compact(v), SSTableId(dir, no++)));
+        }
+        else {
+            ssts.emplace_back(mem, SSTableId(dir, no++));
+        }
+        byteCnt = ssts[0].getSpace();
+        size = 1;
+    }
+    else {
+        ssts.emplace_back(mem, SSTableId(dir, no++));
+        ++size;
+        byteCnt += mem.size();
+    }
     save();
 }
 
 std::map<int, Value> LevelZero::extract() {
-    std::vector<std::map<int, Value>> inputs;
-    for (const SSTable &sst : ssts) {
-        inputs.emplace_back(sst.load());
-        sst.remove();
+    std::map<int, Value> t;
+    if (Option::LEVELING) {
+        t = ssts[0].load();
     }
-    size = 0;
-    byteCnt = 0;
-    ssts.clear();
+    else {
+        std::vector<std::map<int, Value>> inputs;
+        for (const SSTable &sst: ssts) {
+            inputs.emplace_back(sst.load());
+            sst.remove();
+        }
+        t = Util::compact(inputs);
+    }
+    clear();
     save();
-    return Util::compact(inputs);
+    return t;
 }
 
 void LevelZero::clear() {

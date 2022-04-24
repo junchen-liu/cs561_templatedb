@@ -20,6 +20,7 @@ private:
     uint64_t byteCnt;
     std::vector<SSTable> ssts;
     void save() const;
+
 };
 
 #endif

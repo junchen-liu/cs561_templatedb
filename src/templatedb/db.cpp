@@ -16,7 +16,7 @@ Value DB::get(int key)
 void DB::put(int key, Value val)
 {
     table[key] = val;
-    if (table.size() >= Option::SST_SPACE) {
+    if (table.size() >= Option::MEM_SPACE) {
 		disk.add(table);
 		table.clear();
 	}

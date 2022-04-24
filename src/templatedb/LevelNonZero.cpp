@@ -2,6 +2,7 @@
 #include "Util.hpp"
 #include "SSTableId.hpp"
 #include "Value.hpp"
+#include "Option.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -30,51 +31,59 @@ LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
 }
 
 Value LevelNonZero::search(uint64_t key) const {
-    for (const SSTable &sst : ssts) {
-        Value res = sst.search(key);
+    for (uint64_t i = 1; i <= size; ++i) {
+        Value res = ssts[size - i].search(key);
         if (res.visible)
             return res;
     }
-    return Value(false);
+    return {false};
 }
 
 std::map<int, Value> LevelNonZero::extract() {
-    auto itr = ssts.begin();
-    while (itr != ssts.end() && itr->load().rbegin()->first <= lastKey)
-        ++itr;
-    if (itr == ssts.end())
-        itr = ssts.begin();
-    byteCnt -= itr->getSpace();
-    lastKey = itr->load().rbegin()->first;
-    std::map<int, Value> ret = itr->load();
-    itr->remove();
-    ssts.erase(itr);
-    --size;
+    std::map<int, Value> ret;
+    if (Option::LEVELING) {
+        auto itr = ssts.begin();
+        ret = itr->load();
+        clear();
+    }
+    else {
+        auto itr = ssts.begin();
+        while (itr != ssts.end() && itr->load().rbegin()->first <= lastKey)
+            ++itr;
+        if (itr == ssts.end())
+            itr = ssts.begin();
+        byteCnt -= itr->getSpace();
+        lastKey = itr->load().rbegin()->first;
+        ret = itr->load();
+        itr->remove();
+        ssts.erase(itr);
+        --size;
+    }
     save();
     return ret;
 }
 
 void LevelNonZero::merge(std::map<int, Value> &&entries1, uint64_t &no) {
-    uint64_t lo = entries1.begin()->first;
-    uint64_t hi = entries1.rbegin()->first;
-    std::map<int, Value> entries0;
-    auto itr = ssts.begin();
-    while (itr != ssts.end() && itr->load().rbegin()->first < lo)
-        ++itr;
-    while (itr != ssts.end() && itr->load().begin()->first <= hi) {
-        std::map<int, Value> loadmap = itr->load();
-        entries0.insert(loadmap.begin(), loadmap.end());
-        byteCnt -= itr->getSpace();
-        itr->remove();
-        itr = ssts.erase(itr);
-        --size;
+    if (Option::LEVELING) {
+        if (size) {
+            std::map<int, Value> entries = ssts.begin()->load();
+            std::vector<std::map<int, Value>> v;
+            v.emplace_back(entries);
+            v.emplace_back(entries1);
+            clear();
+            ssts.insert(ssts.begin(), SSTable(Util::compact(v), SSTableId(dir, no++)));
+        }
+        else {
+            ssts.emplace_back(entries1, SSTableId(dir, no++));
+        }
+        byteCnt = ssts.begin()->getSpace();
+        size = 1;
     }
-    std::vector<std::map<int, Value>> v;
-    v.emplace_back(entries0);
-    v.emplace_back(entries1);
-    std::map<int, Value> entries = Util::compact(v);
-    byteCnt += ssts.emplace(itr, entries, SSTableId(dir, no++))->getSpace();
-    ++size;
+    else {
+        ssts.emplace_back(entries1, SSTableId(dir, no++));
+        ++size;
+        byteCnt += entries1.size();
+    }
     save();
 }
 

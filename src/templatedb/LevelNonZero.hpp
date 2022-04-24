@@ -5,7 +5,6 @@
 #include <string>
 #include <cstdint>
 #include <vector>
-#include <list>
 #include <map>
 
 class LevelNonZero {
@@ -21,7 +20,7 @@ private:
     uint64_t size;
     uint64_t byteCnt;
     uint64_t lastKey;
-    std::list<SSTable> ssts;
+    std::vector<SSTable> ssts;
     void save() const;
 };
 
