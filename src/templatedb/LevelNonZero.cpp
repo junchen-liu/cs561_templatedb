@@ -4,6 +4,7 @@
 #include "Value.hpp"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 
 LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
@@ -72,12 +73,8 @@ void LevelNonZero::merge(std::map<int, Value> &&entries1, uint64_t &no) {
     v.emplace_back(entries0);
     v.emplace_back(entries1);
     std::map<int, Value> entries = Util::compact(v);
-    size_t n = entries.size();
-    size_t pos = 0;
-    while (pos < n) {
-        byteCnt += ssts.emplace(itr, entries, SSTableId(dir, no++))->getSpace();
-        ++size;
-    }
+    byteCnt += ssts.emplace(itr, entries, SSTableId(dir, no++))->getSpace();
+    ++size;
     save();
 }
 

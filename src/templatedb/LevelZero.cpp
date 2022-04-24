@@ -3,6 +3,7 @@
 #include "Util.hpp"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 LevelZero::LevelZero(const std::string &dir): dir(dir){
     if (!std::__fs::filesystem::exists(std::__fs::filesystem::path(dir))) {

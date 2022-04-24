@@ -62,9 +62,7 @@ void DB::del(int key)
     if (table.count(key))
         table.erase(key);
     else {
-        Value result = this->get(key);
-        result.visible = false;
-        this->put(key,result);
+        this->put(key,Value(false));
     }
     
 }

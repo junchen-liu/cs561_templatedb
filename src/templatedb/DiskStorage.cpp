@@ -21,12 +21,11 @@ DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option:
 }
 
 void DiskStorage::add(const std::map<int, Value> &mem) {
-    level0.add(mem, no); 
+    level0.add(mem, no);
     //Compaction
     if (level0.space() > Option::Z_SPACE){
         levels[0].merge(level0.extract(), no);
     }
-        
     for (uint64_t i = 0; i + 1 < Option::NZ_NUM; ++i)
         if (levels[i].space() > Option::NZ_SPACES[i])
             levels[i + 1].merge(levels[i].extract(), no);
@@ -35,7 +34,6 @@ void DiskStorage::add(const std::map<int, Value> &mem) {
 
 Value DiskStorage::search(int key) {
     Value searchResult = level0.search(key);
-    std::cout << searchResult.visible << std::endl;
     if (!searchResult.visible)
         for (uint64_t i = 0; !searchResult.visible && i < Option::NZ_NUM; ++i)
             searchResult = levels[i].search(key);

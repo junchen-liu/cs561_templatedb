@@ -25,7 +25,6 @@ SSTable::SSTable(const std::map<int, Value> &entries, const SSTableId &id)
 Value SSTable::search(int key) const {
     std::map<int, Value> entries = load();
     if (entries.count(key)) {
-        std::cout << "Found" << std::endl;
         return entries[key];
     }
     return Value(false);
