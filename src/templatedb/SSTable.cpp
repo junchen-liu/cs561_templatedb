@@ -39,14 +39,25 @@ std::map<int, Value> SSTable::load() const {
     {
         std::vector<int> items = std::vector<int>();
 
+        Value v;
+
         std::stringstream linestream(line);
         std::getline(linestream, key_str, ' '); // First argument is a key
+        std::getline(linestream, visible_str, ' '); // Second argument is if visible
         int key = stoi(key_str);
-        while(std::getline(linestream, item, ' '))
-        {
-            items.push_back(stoi(item));
+        int ifVisible = stoi(visible_str);
+
+        if (ifVisible == 0){
+            v.visible = false;
+        } else{
+            v.visible = true;
+            while(std::getline(linestream, item, ' '))
+            {
+                items.push_back(stoi(item));
+            }
+            Value v = Value(items);
         }
-        Value v = Value(items);
+
         entries[key] = v;
         // std::cout << key << std::endl;
     }
@@ -70,6 +81,11 @@ void SSTable::save(const std::map<int, Value> &entries) {
     std::ofstream file(sstbId.name());
     for (const auto &i : entries) {
         file << i.first << ' ';
+        if(i.second.visible){
+            file << 1 << ' '; //Visible == True
+        } else{
+            file << 0 << ' ';
+        }
         for (const auto &j : i.second.items){
             file << j<< ' ';
         }
