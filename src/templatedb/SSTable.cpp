@@ -34,7 +34,7 @@ std::map<int, Value> SSTable::load() const {
     std::map<int, Value> entries;
     ifstream file(sstbId.name());
 
-    std::string line, item, op_string, key_str;
+    std::string line, item, op_string, key_str, visible_str;
     while (std::getline(file, line))
     {
         std::vector<int> items = std::vector<int>();
