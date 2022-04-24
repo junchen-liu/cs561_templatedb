@@ -55,7 +55,7 @@ std::map<int, Value> SSTable::load() const {
             {
                 items.push_back(stoi(item));
             }
-            Value v = Value(items);
+            v.items = items;
         }
 
         entries[key] = v;
