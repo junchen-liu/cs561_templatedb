@@ -18,9 +18,13 @@ int main (int argc, char *argv[])
     db.put(5, v1);
     db.put(9, v1);
 
-    auto val = db.get(4);
-    if (val.visible)
-        cout << val.items[1] << endl;
-    else
-        cout << "Not found" << endl;
+    auto vals = db.scan(4, 9);
+    for (auto v : vals) {
+        if (v.visible) {
+            cout << v.items.size() << endl;
+        }
+        else {
+            cout << "Not visible" << endl;
+        }
+    }
 }

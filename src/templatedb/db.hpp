@@ -50,6 +50,8 @@ private:
     std::map<int, Value> table;
     size_t value_dimensions = 0;
     DiskStorage disk;
+    int min_key;
+    int max_key;
     bool write_to_file();
 };
 

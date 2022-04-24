@@ -1,4 +1,6 @@
 #include "db.hpp"
+
+#include <utility>
 #include "Option.hpp"
 
 using namespace templatedb;
@@ -15,7 +17,9 @@ Value DB::get(int key)
 
 void DB::put(int key, Value val)
 {
-    table[key] = val;
+    min_key = std::min(key, min_key);
+    max_key = std::max(key, max_key);
+    table[key] = std::move(val);
     if (table.size() >= Option::MEM_SPACE) {
 		disk.add(table);
 		table.clear();
@@ -26,33 +30,30 @@ void DB::put(int key, Value val)
 
 std::vector<Value> DB::scan()
 {
-    std::vector<Value> return_vector;
-    for (auto pair: table)
-    {
-        return_vector.push_back(pair.second);
-    }
-
-
-    return return_vector;
+    return scan(min_key, max_key);
 }
 
 
 std::vector<Value> DB::scan(int min_key, int max_key)
 {
+    std::map<int, Value> return_map;
     std::vector<Value> return_vector;
+
     for (auto pair: table)
     {
-        if ((pair.first >= min_key) && (pair.first <= max_key))
-            return_vector.push_back(pair.second);
+        if ((pair.first >= min_key) && (pair.first <= max_key) && pair.second.visible)
+            return_map[pair.first] = pair.second;
     }
 
     for (int i = min_key; i <= max_key; ++i)
     {
         Value res = disk.search(i);
-        if (res.visible)
-            return_vector.push_back(res);
+        if (res.visible && !return_map.contains(i))
+            return_map[i] = res;
     }
 
+    for (auto & it : return_map)
+        return_vector.push_back(it.second);
     return return_vector;
 }
 
