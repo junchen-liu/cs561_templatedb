@@ -48,7 +48,7 @@ std::vector<Value> DB::scan(int min_key, int max_key)
     for (int i = min_key; i <= max_key; ++i)
     {
         Value res = disk.search(i);
-        if (res.visible && (!return_map.count(i)>0))
+        if (res.visible && !(return_map.count(i)>0))
             return_map[i] = res;
     }
 
