@@ -14,6 +14,8 @@ set(templatedb_lib
     src/templatedb/SSTableId.hpp
     src/templatedb/Util.hpp
     src/templatedb/Value.hpp
+        src/templatedb/DeleteTable.h
+        src/templatedb/DeleteTable.cpp
     src/templatedb/db.cpp
     src/templatedb/operation.cpp
     src/templatedb/DiskStorage.cpp
