@@ -6,8 +6,11 @@
 #include <filesystem>
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
-DeleteTable::DeleteTable() {
+DeleteTable::DeleteTable() : DeleteTable("dtFile") {}
+
+DeleteTable::DeleteTable(const std::string& fileName) : fileName(fileName) {
     //Find if there exist dt file, if so load
     if (std::filesystem::exists(std::filesystem::path(fileName))){
         this->load();

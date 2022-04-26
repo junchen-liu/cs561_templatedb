@@ -13,7 +13,7 @@ using namespace std;
 class MinMaxPair
 {
 public:
-    int minKey ;
+    int minKey;
     int maxKey;
     unsigned long int t;
 
@@ -37,6 +37,7 @@ public:
 class DeleteTable {
 public:
     DeleteTable();
+    DeleteTable(const std::string&);
     ~DeleteTable() {close();};
 
     unsigned long int getTimeInt(int key); //If get 0, then not in dt.
@@ -45,7 +46,7 @@ public:
 
 private:
     vector<MinMaxPair> vec;
-    string fileName = "dtFile";
+    string fileName;
 
     void load();
     void save();

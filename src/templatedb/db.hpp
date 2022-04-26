@@ -28,7 +28,10 @@ class DB
 public:
     db_status status;
 
-    DB() {}
+    DB() : DB("./diskdata") {}
+    DB(std::string dir) : disk(dir), deleteTable(dir.erase(0, 2) + "DelTable") {
+        this->dir=dir;
+    }
     ~DB() {close();};
 
     Value get(int key);
@@ -48,6 +51,7 @@ public:
 
 private:
     std::fstream file;
+    std::string dir;
     std::map<int, Value> table;
     size_t value_dimensions = 0;
     DiskStorage disk;

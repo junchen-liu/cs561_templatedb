@@ -9,9 +9,9 @@
 class DBTest : public ::testing::Test
 {
 protected:
-    templatedb::DB db0;
-    templatedb::DB db1;
-    templatedb::DB db2;
+    templatedb::DB db0 = templatedb::DB("./db0");
+    templatedb::DB db1 = templatedb::DB("./db1");
+    templatedb::DB db2 = templatedb::DB("./db2");
 
     Value v1 = Value({1, 2});
     Value v2 = Value({6, 10});
