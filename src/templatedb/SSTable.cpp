@@ -38,8 +38,7 @@ std::map<int, Value> SSTable::search(int min_key, int max_key) const {
         auto lower = entries.lower_bound(min_key);
         auto upper = entries.upper_bound(max_key);
         for (auto it = lower; it != upper; ++it) {
-            if (it->second.visible)
-                ret[it->first] = it->second;
+            ret[it->first] = it->second;
         }
     }
     return ret;
