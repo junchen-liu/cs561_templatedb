@@ -47,6 +47,11 @@ std::map<int, Value> DiskStorage::search(int min_key, int max_key) {
         std::map<int, Value> v = lv.search(min_key, max_key);
         ret_map.merge(v);
     }
+    for (auto it = ret_map.cbegin(); it != ret_map.cend();)
+        if (!it->second.visible)
+            ret_map.erase(it++);
+        else
+            ++it;
     return ret_map;
 }
 
