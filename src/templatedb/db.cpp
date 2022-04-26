@@ -160,21 +160,35 @@ db_status DB::open(std::string & fname)
             return this->status;
 
         int key;
+        bool visible;
+        int64_t timestamp;
         std::string line;
         std::getline(file, line); // First line is rows, col
         while (std::getline(file, line))
         {
             std::stringstream linestream(line);
-            std::string item;
+            std::string item, _key, _visible, _timestamp;
 
-            std::getline(linestream, item, ',');
-            key = stoi(item);
+            std::getline(linestream, _key, ',');
+            std::getline(linestream, _visible, ',');
+            std::getline(linestream, _timestamp, ',');
+            key = stoi(_key);
+            visible = stoi(_visible);
+            timestamp = stoll(_timestamp);
+
             std::vector<int> items;
-            while(std::getline(linestream, item, ','))
-            {
-                items.push_back(stoi(item));
+            Value v;
+            if (visible) {
+                while (std::getline(linestream, item, ',')) {
+                    items.push_back(stoi(item));
+                }
+                v = Value(items);
+                v.visible = visible;
+                v.timestamp = timestamp;
             }
-            this->put(key, Value(items));
+            else
+                v = Value(false);
+            this->put(key, v);
             if (value_dimensions == 0)
                 value_dimensions = items.size();
         }
@@ -201,6 +215,7 @@ bool DB::close()
         this->write_to_file();
         file.close();
     }
+    deleteTable.close();
     this->status = CLOSED;
 
     return true;
@@ -217,10 +232,12 @@ bool DB::write_to_file()
     for(auto item: table)
     {
         std::ostringstream line;
-        std::copy(item.second.items.begin(), item.second.items.end() - 1, std::ostream_iterator<int>(line, ","));
-        line << item.second.items.back();
+        if (item.second.visible) {
+            std::copy(item.second.items.begin(), item.second.items.end() - 1, std::ostream_iterator<int>(line, ","));
+            line << item.second.items.back();
+        }
         std::string value(line.str());
-        file << item.first << ',' << value << '\n';
+        file << item.first << ',' << item.second.visible << ',' << item.second.timestamp << ',' << value << '\n';
     }
 
     return true;
