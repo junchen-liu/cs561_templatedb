@@ -4,15 +4,12 @@
 #include <cstdint>
 
 namespace Option {
-    const bool COMPRESSION = true;
-    const bool COMPACTION = true;
-    const bool BLOCK_CACHE = true;
     const bool LEVELING = true;
-    const uint64_t MEM_SPACE = (uint64_t) 2;
+    const uint64_t MEM_SPACE = (uint64_t) 2 * 1024 * 1024;
     const uint64_t NZ_NUM = 3;
-    const uint64_t Z_SPACE = (uint64_t) 4;
+    const uint64_t Z_SPACE = (uint64_t) 8 * 1024 * 1024;
     const uint64_t NZ_SPACES[] = {
-        (uint64_t) 8,
+        (uint64_t) 32 * 1024 * 1024,
         (uint64_t) 128 * 1024 * 1024,
         UINT64_MAX
     };
