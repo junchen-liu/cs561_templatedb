@@ -22,6 +22,7 @@ set(templatedb_lib
     src/templatedb/LevelZero.cpp
     src/templatedb/SSTable.cpp
     src/templatedb/SSTableId.cpp
+    src/templatedb/TimeUtil.h
 )
 
 set(bloomfilter_lib

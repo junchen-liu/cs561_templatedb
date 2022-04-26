@@ -8,7 +8,7 @@ using namespace templatedb;
 Value DB::get(int key)
 {
     Value v;
-    if (table.count(key)){
+    if (table.contains(key)){
         v = table[key];
     }
     v = disk.search(key);
