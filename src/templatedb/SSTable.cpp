@@ -1,4 +1,5 @@
 #include "SSTable.hpp"
+#include <sstream>
 #include <fstream>
 #include <filesystem>
 #include <vector>

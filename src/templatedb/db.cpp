@@ -76,13 +76,6 @@ void DB::del(int key)
 
 void DB::del(int min_key, int max_key)
 {
-//    for (auto it = table.begin(); it != table.end(); ) {
-//        if ((it->first >= min_key) && (it->first <= max_key)){
-//            table.erase(it++);
-//        } else {
-//            ++it;
-//        }
-//    }
       deleteTable.del(min_key,max_key);
 }
 

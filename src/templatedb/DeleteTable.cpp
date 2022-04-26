@@ -4,6 +4,7 @@
 
 #include "DeleteTable.h"
 #include <filesystem>
+#include <sstream>
 #include <fstream>
 
 DeleteTable::DeleteTable() {
