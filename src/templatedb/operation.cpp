@@ -4,13 +4,13 @@ using namespace templatedb;
 
 Operation::Operation(std::string op_string, int _key, std::vector<int> & _args)
 {
-    if (op_string == "I")
+    if (op_string == "PUT")
         type = PUT;
-    else if (op_string == "Q")
+    else if (op_string == "GET")
         type = GET;
-    else if (op_string == "S")
+    else if (op_string == "SCAN")
         type = SCAN;
-    else if (op_string == "D")
+    else if (op_string == "DELETE")
         type = DELETE;
     else
         type = NO_OP;
@@ -44,9 +44,9 @@ std::vector<Operation> Operation::ops_from_file(std::string file_name)
             args = std::vector<int>();
 
             std::stringstream linestream(line);
-            std::getline(linestream, op_string, ' '); // First line is an op_code
-            std::getline(linestream, key, ' '); // First argument is a key
-            while(std::getline(linestream, item, ' '))
+            std::getline(linestream, op_string, ','); // First line is an op_code
+            std::getline(linestream, key, ','); // First argument is a key
+            while(std::getline(linestream, item, ','))
             {
                 args.push_back(stoi(item));
             }
