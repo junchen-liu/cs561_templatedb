@@ -67,7 +67,7 @@ std::map<int, Value> SSTable::load() const {
         } else{
             v.visible = true;
             std::getline(linestream, timestamp_str, ' '); // Third argument is timestamp
-            unsigned long int t = stoi(timestamp_str);
+            int64_t t = stoi(timestamp_str);
             v.timestamp = t;
             while(std::getline(linestream, item, ' '))
             {

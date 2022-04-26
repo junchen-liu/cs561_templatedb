@@ -2,13 +2,13 @@
 #define VALUE_H
 
 #include <vector>
-#include <ctime>
-
+#include "TimeUtil.h"
 class Value {
 public:
     std::vector<int> items;
     bool visible = true;
-    unsigned long int timestamp = time(nullptr);
+//    unsigned long int timestamp = time(nullptr);
+    int64_t timestamp = TimeUtil::getCurrentLocalTimeStamp();
 
     Value() = default;
     Value(bool _visible): visible(_visible) {}
@@ -18,6 +18,7 @@ public:
     {
         return (visible == other.visible) && (items == other.items);
     }
+
 };
 
 #endif

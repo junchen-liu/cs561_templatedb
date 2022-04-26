@@ -12,7 +12,7 @@ Value DB::get(int key)
         v = table[key];
     }
     v = disk.search(key);
-    unsigned long int t = deleteTable.getTimeInt(key);
+    int64_t t = deleteTable.getTimeInt(key);
     if (t > v.timestamp){
         v.visible = false;
     }

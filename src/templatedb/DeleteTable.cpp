@@ -21,7 +21,7 @@ void DeleteTable::del(int min_key, int max_key) {
     vec.emplace_back(min_key,max_key);
 }
 
-unsigned long int DeleteTable::getTimeInt(int key) {
+int64_t DeleteTable::getTimeInt(int key) {
     for (auto it = vec.rbegin(); it != vec.rend(); ++it)
     {
         if(key <= it->maxKey && key >= it->minKey){

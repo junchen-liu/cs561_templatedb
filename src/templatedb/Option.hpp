@@ -7,7 +7,7 @@ namespace Option {
     const bool COMPRESSION = true;
     const bool COMPACTION = true;
     const bool BLOCK_CACHE = true;
-    const bool LEVELING = true;
+    const bool LEVELING = false;
     const uint64_t MEM_SPACE = (uint64_t) 2;
     const uint64_t NZ_NUM = 3;
     const uint64_t Z_SPACE = (uint64_t) 4;
