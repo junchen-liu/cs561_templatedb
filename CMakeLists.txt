@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(templatedb VERSION 0.1.0)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 
 set(templatedb_lib
     src/templatedb/db.hpp
@@ -9,7 +9,6 @@ set(templatedb_lib
     src/templatedb/LevelNonZero.hpp
     src/templatedb/LevelZero.hpp
     src/templatedb/Option.hpp
-    src/templatedb/SearchResult.hpp
     src/templatedb/SSTable.hpp
     src/templatedb/SSTableId.hpp
     src/templatedb/Util.hpp
@@ -21,7 +20,6 @@ set(templatedb_lib
     src/templatedb/DiskStorage.cpp
     src/templatedb/LevelNonZero.cpp
     src/templatedb/LevelZero.cpp
-    src/templatedb/SearchResult.cpp
     src/templatedb/SSTable.cpp
     src/templatedb/SSTableId.cpp
 )
