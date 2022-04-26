@@ -7,6 +7,7 @@
 #include <ctime>
 #include <vector>
 #include <string>
+#include "TimeUtil.h"
 
 using namespace std;
 
@@ -15,14 +16,12 @@ class MinMaxPair
 public:
     int minKey;
     int maxKey;
-    unsigned long int t;
-
-
+    int64_t t;
 
     MinMaxPair(int _min, int _max) {
         minKey = _min;
         maxKey = _max;
-        t = time(nullptr);
+        t = TimeUtil::getCurrentLocalTimeStamp();
     }
 
     MinMaxPair(int _min, int _max, unsigned long int _t) {
@@ -40,7 +39,7 @@ public:
     DeleteTable(const std::string&);
     ~DeleteTable() {close();};
 
-    unsigned long int getTimeInt(int key); //If get 0, then not in dt.
+    int64_t getTimeInt(int key); //If get 0, then not in dt.
     void del(int min_key, int max_key);
     void close();
 
