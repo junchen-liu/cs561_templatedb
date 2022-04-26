@@ -9,7 +9,8 @@
 class LevelZero {
 public:
     explicit LevelZero(const std::string &dir);
-    Value search(uint64_t key) const;
+    Value search(int key) const;
+    std::map<int, Value> search(int min_key, int max_key) const;
     void add(const std::map<int, Value> &mem, uint64_t &no);
     std::map<int, Value> extract();
     void clear();

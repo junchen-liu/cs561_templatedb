@@ -40,6 +40,16 @@ Value DiskStorage::search(int key) {
     return searchResult;
 }
 
+std::map<int, Value> DiskStorage::search(int min_key, int max_key) {
+    std::map<int, Value> ret_map;
+    ret_map.merge(level0.search(min_key, max_key));
+    for (auto lv : levels) {
+        std::map<int, Value> v = lv.search(min_key, max_key);
+        ret_map.merge(v);
+    }
+    return ret_map;
+}
+
 void DiskStorage::clear() {
     level0.clear();
     for (uint64_t i = 0; i < Option::NZ_NUM; ++i)

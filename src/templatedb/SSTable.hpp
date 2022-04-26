@@ -12,6 +12,7 @@ public:
     explicit SSTable(const SSTableId &sstbId);
     explicit SSTable(const std::map<int, Value> &mem, const SSTableId &id);
     Value search(int key) const;
+    std::map<int, Value> search(int min_key, int max_key) const;
     std::map<int, Value> load() const;
     int getSpace() const;
     void remove() const;

@@ -30,13 +30,21 @@ LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
     }
 }
 
-Value LevelNonZero::search(uint64_t key) const {
+Value LevelNonZero::search(int key) const {
     for (uint64_t i = 1; i <= size; ++i) {
         Value res = ssts[size - i].search(key);
         if (res.visible)
             return res;
     }
     return {false};
+}
+
+std::map<int, Value> LevelNonZero::search(int min_key, int max_key) const {
+    std::map<int, Value> ret_map;
+    for (auto it = ssts.rbegin(); it != ssts.rend(); ++it) {
+        ret_map.merge(it->search(min_key, max_key));
+    }
+    return ret_map;
 }
 
 std::map<int, Value> LevelNonZero::extract() {

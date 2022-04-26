@@ -17,6 +17,7 @@ public:
     explicit DiskStorage(const std::string &dir);
     void add(const std::map<int, Value> &mem);
     Value search(int key);
+    std::map<int, Value> search(int min_key, int max_key);
     void clear();
 private:
     std::string dir;

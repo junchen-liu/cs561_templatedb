@@ -46,19 +46,16 @@ std::vector<Value> DB::scan(int min_key, int max_key)
 
     for (auto pair: table)
     {
-        if ((pair.first >= min_key) && (pair.first <= max_key) && pair.second.visible)
+        if ((pair.first >= min_key) && (pair.first <= max_key))
             return_map[pair.first] = pair.second;
     }
-
-    for (int i = min_key; i <= max_key; ++i)
-    {
-        Value res = disk.search(i);
-        if (res.visible && !return_map.contains(i))
-            return_map[i] = res;
+    return_map.merge(disk.search(min_key, max_key));
+    for (auto & it : return_map) {
+        unsigned long int t = deleteTable.getTimeInt(it.first);
+        if (t <= it.second.timestamp && it.second.visible){
+            return_vector.push_back(it.second);
+        }
     }
-
-    for (auto & it : return_map)
-        return_vector.push_back(it.second);
     return return_vector;
 }
 
