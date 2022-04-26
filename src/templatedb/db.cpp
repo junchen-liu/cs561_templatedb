@@ -8,10 +8,10 @@ using namespace templatedb;
 Value DB::get(int key)
 {
     Value v;
-    if (table.contains(key)){
+    if (table.count(key))
         v = table[key];
-    }
-    v = disk.search(key);
+    else
+        v = disk.search(key);
     int64_t t = deleteTable.getTimeInt(key);
     if (t > v.timestamp){
         v.visible = false;
