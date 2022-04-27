@@ -13,7 +13,7 @@ Value DB::get(int key)
     else
         v = disk.search(key);
     int64_t t = deleteTable.getTimeInt(key);
-    if (t > v.timestamp){
+    if (t > v.timestamp || !bf.query(to_string(key))){
         v.visible = false;
     }
 	return v;
@@ -22,6 +22,8 @@ Value DB::get(int key)
 
 void DB::put(int key, Value val)
 {
+    bf.program(to_string(key));
+
     min_key = std::min(key, min_key);
     max_key = std::max(key, max_key);
     table[key] = std::move(val);

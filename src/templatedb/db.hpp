@@ -12,7 +12,10 @@
 #include "operation.hpp"
 #include "Value.hpp"
 #include "DeleteTable.h"
+#include "BloomFilter/BloomFilter.h"
 
+
+using namespace BF;
 namespace templatedb
 {
 
@@ -49,6 +52,9 @@ public:
 
     std::vector<Value> execute_op(Operation op);
 
+    BloomFilter bf = BloomFilter(1024, 10); // number of keys, bits per element
+
+
 private:
     std::fstream file;
     std::string dir;
@@ -59,6 +65,8 @@ private:
     int max_key;
     bool write_to_file();
     DeleteTable deleteTable;
+
+
 };
 
 }   // namespace templatedb
