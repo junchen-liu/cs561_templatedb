@@ -8,12 +8,18 @@ using namespace templatedb;
 Value DB::get(int key)
 {
     Value v;
+    if (!bf.query(to_string(key))){
+        v.visible = false;
+        return v;
+    }
+
     if (table.count(key))
         v = table[key];
     else
         v = disk.search(key);
     int64_t t = deleteTable.getTimeInt(key);
-    if (t > v.timestamp || !bf.query(to_string(key))){
+    if (t > v.timestamp){
+
         v.visible = false;
     }
 	return v;
