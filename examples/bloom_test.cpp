@@ -13,8 +13,8 @@ void queryTest( BloomFilter *bf,  string key ){
 
 int main(int argc, char * argv[])
 {
-    BloomFilter bf( 1024, 10 ); // number of keys, bits per element
-
+    BloomFilter bf( 1024, 20 ); // number of keys, bits per element
+//
     // Enpty filter is not match, at this level
     queryTest(&bf, "hello");
     queryTest(&bf, "world");
@@ -28,5 +28,14 @@ int main(int argc, char * argv[])
     queryTest(&bf, "x");
     queryTest(&bf, "foo");
 
+    bf.save("test-bf");
+    BloomFilter bf2( "test-bf");
+    cout << bf2.bitsPerElement << endl;
+    queryTest(&bf2, "hello");
+    queryTest(&bf2, "world");
+    queryTest(&bf2, "x");
+    queryTest(&bf2, "foo");
+
     return 0;
+;
 }
