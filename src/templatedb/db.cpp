@@ -81,7 +81,7 @@ void DB::del(int key)
 
 void DB::del(int min_key, int max_key)
 {
-      deleteTable.del(min_key,max_key);
+    deleteTable.del(min_key,max_key);
 }
 
 

@@ -41,14 +41,19 @@ int main(int argc, char * argv[])
     config cfg = cmdline_settings(argc, argv);
 
     templatedb::DB db;
+    auto start = std::chrono::high_resolution_clock::now();
     if (db.open(cfg.dbname) != templatedb::OPEN)
     {
         fprintf(stderr, "Unable to load DB %s\n", cfg.dbname.c_str());
         exit(EXIT_FAILURE);
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    printf("Insert mem_table Time %d us\n", duration);
     
     if (!cfg.fname.empty())
     {
+        start = std::chrono::high_resolution_clock::now();
         if (!db.load_data_file(cfg.fname))
         {
             fprintf(stderr, "Unable to load data file %s into DB\n", cfg.fname.c_str());
@@ -56,17 +61,24 @@ int main(int argc, char * argv[])
                 db.close();
             exit(EXIT_FAILURE);
         }
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+        printf("Load Data Time %d us\n", duration);
     }
 
     std::vector<templatedb::Operation> ops = templatedb::Operation::ops_from_file(cfg.wlname);
+    int cnt = 0;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    start = std::chrono::high_resolution_clock::now();
     for (auto op : ops)
     {
         db.execute_op(op);
+        if (++cnt % 50 == 0)
+            std::cout << cnt << std::endl;
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     printf("Workload Time %d us\n", duration);
 

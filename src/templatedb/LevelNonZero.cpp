@@ -55,17 +55,12 @@ std::map<int, Value> LevelNonZero::extract() {
         clear();
     }
     else {
-        auto itr = ssts.begin();
-        while (itr != ssts.end() && itr->load().rbegin()->first <= lastKey)
-            ++itr;
-        if (itr == ssts.end())
-            itr = ssts.begin();
-        byteCnt -= itr->getSpace();
-        lastKey = itr->load().rbegin()->first;
-        ret = itr->load();
-        itr->remove();
-        ssts.erase(itr);
-        --size;
+        std::vector<std::map<int, Value>> inputs;
+        for (const SSTable &sst: ssts) {
+            inputs.emplace_back(sst.load());
+            sst.remove();
+        }
+        ret = Util::compact(inputs);
     }
     save();
     return ret;
