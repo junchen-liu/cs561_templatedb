@@ -1,3 +1,5 @@
+#ifndef _BLOOMFILTER_BLOOMFILTER_H_
+#define _BLOOMFILTER_BLOOMFILTER_H_
 #include <vector>
 #include <string>
 #include <math.h>
@@ -34,3 +36,5 @@ private:
 };
 
 } // namespace BF
+
+#endif
