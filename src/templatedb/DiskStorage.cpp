@@ -24,11 +24,16 @@ void DiskStorage::add(const std::map<int, Value> &mem) {
     level0.add(mem, no);
     //Compaction
     if (level0.space() > Option::Z_SPACE){
-        levels[0].merge(level0.extract(), no);
+        levels[0].merge(level0.extract(no), no);
+        level0.clear();
+        level0.save();
     }
     for (uint64_t i = 0; i + 1 < Option::NZ_NUM; ++i)
-        if (levels[i].space() > Option::NZ_SPACES[i])
-            levels[i + 1].merge(levels[i].extract(), no); //append to the next level
+        if (levels[i].space() > Option::NZ_SPACES[i]) {
+            levels[i + 1].merge(levels[i].extract(no), no); //append to the next level
+            levels[i].clear();
+            levels[i].save();
+        }
     save();
 }
 

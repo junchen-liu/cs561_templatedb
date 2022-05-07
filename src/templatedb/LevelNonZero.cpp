@@ -50,45 +50,36 @@ std::map<int, Value> LevelNonZero::search(int min_key, int max_key) const {
     return ret_map;
 }
 
-std::map<int, Value> LevelNonZero::extract() { //Merge sort this level
-    std::map<int, Value> ret;
+std::vector<SSTable> LevelNonZero::extract(uint64_t &no) { //Merge sort this level
+    std::vector<SSTable> t;
     if (Option::LEVELING) {
-        auto itr = ssts.begin();
-        ret = itr->load();
-        clear();
+        t = ssts;
     }
     else {
-//        std::vector<std::map<int, Value>> inputs;
-//        for (const SSTable &sst: ssts) {
-//            inputs.emplace_back(sst.load());
-//            sst.remove();
-//        }
-//        ret = Util::compact(inputs);
+        t = Util::compact(ssts, dir, no);
     }
-    save();
-    return ret;
+    return t;
 }
 
-void LevelNonZero::merge(std::map<int, Value> &&entries1, uint64_t &no) {
+void LevelNonZero::merge(std::vector<SSTable> upper, uint64_t &no) {
     if (Option::LEVELING) {
-//        if (size) {
-//            std::map<int, Value> entries = ssts.begin()->load();
-//            std::vector<std::map<int, Value>> v;
-//            v.emplace_back(entries);
-//            v.emplace_back(entries1);
-//            clear();
-//            ssts.insert(ssts.begin(), SSTable(Util::compact(v), SSTableId(dir, no++)));
-//        }
-//        else {
-//            ssts.emplace_back(entries1, SSTableId(dir, no++));
-//        }
-//        byteCnt = ssts.begin()->getSpace();
-//        size = 1;
+        ssts.insert(std::end(ssts), std::begin(upper), std::end(upper));
+        if (ssts.size() > 1) {
+            std::vector<SSTable> newTables = Util::compact(ssts, dir, no);
+            clear();
+            ssts = newTables;
+            size = ssts.size();
+            byteCnt = 0;
+            for (const auto &t: ssts)
+                byteCnt += t.getSpace();
+        }
     }
     else {
-        ssts.emplace_back(entries1, SSTableId(dir, no++));
-        ++size;
-        byteCnt += entries1.size();
+        ssts.insert(std::end(ssts), std::begin(upper), std::end(upper));
+        size = ssts.size();
+        byteCnt = 0;
+        for (auto t : ssts)
+            byteCnt += t.getSpace();
     }
     save();
 }

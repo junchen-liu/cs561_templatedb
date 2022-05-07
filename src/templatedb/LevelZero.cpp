@@ -67,21 +67,14 @@ void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
     save();
 }
 
-std::map<int, Value> LevelZero::extract() {
-    std::map<int, Value> t;
+std::vector<SSTable> LevelZero::extract(uint64_t &no) {
+    std::vector<SSTable> t;
     if (Option::LEVELING) {
-        t = ssts[0].load();
+        t = ssts;
     }
     else {
-//        std::vector<std::map<int, Value>> inputs;
-//        for (const SSTable &sst: ssts) {
-//            inputs.emplace_back(sst.load());
-//            sst.remove();
-//        }
-//        t = Util::compact(inputs);
+        t = Util::compact(ssts, dir, no);
     }
-    clear();
-    save();
     return t;
 }
 
