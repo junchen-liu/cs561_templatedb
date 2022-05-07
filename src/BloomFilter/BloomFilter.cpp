@@ -142,14 +142,10 @@ void BloomFilter::load(string filename) {
 
 }
 
-BloomFilter::BloomFilter(string filename,int numElement_, int bitsPerElement_ ) {
+BloomFilter::BloomFilter(string filename,int numElement_, int bitsPerElement_ ) : BloomFilter(numElement_, bitsPerElement_) {
     //Find if there exist dt file, if so load
     if (std::filesystem::exists(std::filesystem::path(filename))){
         this->load(filename);
     }
-    else{
-        BloomFilter( numElement_, bitsPerElement_ );
-    }
-
 }
 

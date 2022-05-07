@@ -8,7 +8,7 @@
 #include <iostream>
 
 
-LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
+LevelNonZero::LevelNonZero(const std::string &dir): dir(dir), bf(dir+"_bf", 1024, 10) {
     if (!std::filesystem::exists(std::filesystem::path(dir))) {
         std::filesystem::create_directories(std::filesystem::path(dir));
         size = 0;
@@ -50,22 +50,15 @@ std::map<int, Value> LevelNonZero::search(int min_key, int max_key) const {
     return ret_map;
 }
 
-std::vector<SSTable> LevelNonZero::extract(uint64_t &no) { //Merge sort this level
-    std::vector<SSTable> t;
-    if (Option::LEVELING) {
-        t = ssts;
-    }
-    else {
-        t = Util::compact(ssts, dir, no);
-    }
-    return t;
+std::vector<SSTable> LevelNonZero::extract(uint64_t &no) {
+    return ssts;
 }
 
 void LevelNonZero::merge(std::vector<SSTable> upper, uint64_t &no) {
     if (Option::LEVELING) {
         ssts.insert(std::end(ssts), std::begin(upper), std::end(upper));
         if (ssts.size() > 1) {
-            std::vector<SSTable> newTables = Util::compact(ssts, dir, no);
+            std::vector<SSTable> newTables = Util::compact(ssts, dir, no, &bf);
             clear();
             ssts = newTables;
             size = ssts.size();
@@ -75,6 +68,7 @@ void LevelNonZero::merge(std::vector<SSTable> upper, uint64_t &no) {
         }
     }
     else {
+        upper = Util::compact(upper, dir, no, &bf);
         ssts.insert(std::end(ssts), std::begin(upper), std::end(upper));
         size = ssts.size();
         byteCnt = 0;

@@ -49,7 +49,7 @@ void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
     if (Option::LEVELING) {
         ssts.emplace_back(mem, SSTableId(dir, no++));
         if (ssts.size() > 1) {
-            std::vector<SSTable> newTables = Util::compact(ssts, dir, no);
+            std::vector<SSTable> newTables = Util::compact(ssts, dir, no, nullptr);
             clear();
             ssts = newTables;
             size = ssts.size();
@@ -68,14 +68,7 @@ void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
 }
 
 std::vector<SSTable> LevelZero::extract(uint64_t &no) {
-    std::vector<SSTable> t;
-    if (Option::LEVELING) {
-        t = ssts;
-    }
-    else {
-        t = Util::compact(ssts, dir, no);
-    }
-    return t;
+    return ssts;
 }
 
 void LevelZero::clear() {

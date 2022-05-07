@@ -12,7 +12,7 @@ class BloomFilter {
 public:
 	BloomFilter();
 	BloomFilter( int numElement_, int bitsPerElement_ );
-	BloomFilter( string filename,int numElement_, int bitsPerElement_ );
+	BloomFilter( string filename, int numElement_, int bitsPerElement_ );
 	int numElement;
 	int bitsPerElement;
     string filename;

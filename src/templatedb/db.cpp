@@ -30,8 +30,6 @@ void DB::put(int key, Value val)
 {
     bf.program(to_string(key));
 
-    min_key = std::min(key, min_key);
-    max_key = std::max(key, max_key);
     table[key] = std::move(val);
     if (table.size() >= Option::MEM_SPACE) {
 		disk.add(table);

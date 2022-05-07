@@ -19,7 +19,7 @@ public:
     uint64_t space() const;
     void close();
     void save() const;
-    BF::BloomFilter bf = BF::BloomFilter(dir+"_bf", 1024, 10); // number of keys, bits per element
+    BF::BloomFilter bf; // number of keys, bits per element
 private:
     std::string dir;
     uint64_t size;

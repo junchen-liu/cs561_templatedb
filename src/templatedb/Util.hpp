@@ -4,6 +4,7 @@
 #include "Value.hpp"
 #include "Option.hpp"
 #include "SSTable.hpp"
+#include "BloomFilter/BloomFilter.h"
 #include <vector>
 #include <queue>
 #include <algorithm>
@@ -34,7 +35,8 @@ namespace Util {
     };
 
     // Compact several unordered SSTables to ordered SSTables and delete duplicated items.
-    inline std::vector<SSTable> compact(const std::vector<SSTable> &inputs, const std::string& dir, uint64_t &no) {
+    inline std::vector<SSTable> compact(const std::vector<SSTable> &inputs, const std::string& dir,
+                                        uint64_t &no, BF::BloomFilter* bf = nullptr) {
         std::priority_queue<pi, std::vector<pi>, comp> heap;
         std::vector<SSTable> ret;
         int size = 0;
@@ -64,6 +66,8 @@ namespace Util {
             pi cur = heap.top();
             int key = getKey(cur.first);
             if (key != previous_min) {
+                if (bf != nullptr)
+                    bf->program(std::to_string(key));
                 file << cur.first << std::endl;
                 if (size == 0)
                     ret.rbegin()->min_key = key;

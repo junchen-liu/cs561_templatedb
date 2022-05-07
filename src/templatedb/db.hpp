@@ -32,7 +32,7 @@ public:
     db_status status;
 
     DB() : DB("./diskdata") {}
-    DB(std::string dir) : disk(dir), deleteTable(dir.erase(0, 2) + "DelTable") {
+    DB(std::string dir) : disk(dir), deleteTable(dir.erase(0, 2) + "DelTable"), bf(dir+"_bf", 1024, 10) {
         this->dir=dir;
     }
     ~DB() {close();};
@@ -66,7 +66,7 @@ private:
     int max_key;
     bool write_to_file();
     DeleteTable deleteTable;
-    BF::BloomFilter bf = BF::BloomFilter(dir+"_bf", 1024, 10); //bloomfilter for level0 and the Memtable
+    BF::BloomFilter bf; //bloomfilter for level0 and the Memtable
 
 };
 
