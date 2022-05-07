@@ -3,7 +3,8 @@
 
 #include <cstdint>
 
-namespace Option {
+//For tuning.
+namespace Option { 
     const bool LEVELING = true;
     const uint64_t MEM_SPACE = (uint64_t) 2;
     const uint64_t NZ_NUM = 3;
