@@ -71,73 +71,78 @@ int BloomFilter::getSize(){
 }
 
 void BloomFilter::save(string filename) {
-    ofstream file(filename, std::ios::binary);
-    file.write((char*) &numElement, sizeof(int));
-    file.write((char*) &bitsPerElement, sizeof(int));
+
+    ofstream file(filename);
+    file << numElement << endl;
+    file << bitsPerElement << endl;
+    int a = 0;
     for (const auto &i : bf_vec) {
+        a ++;
         if (i){
-            file.write((char*) 1, sizeof(int));
+            file << "1" << endl;
+//            cout << a << endl;
         }
         else{
-            file.write((char*) 0, sizeof(int));
+            file << "0" << endl;
         }
     }
     file.close();
 //    writeVec(bf_vec, filename+"_vec");
-
 }
 
 void BloomFilter::load(string filename) {
     vector<bool> vec;
-
-    std::ifstream rfile(filename, std::ios::binary);
-    rfile.read((char*) &numElement, sizeof(int));
-    rfile.read((char*) &bitsPerElement, sizeof(int));
-    numIndex = (int)floor(0.693*bitsPerElement+ 0.5);
-    size = numElement * bitsPerElement;
-    for (int i = 0; i < size; ++i) {
-        int b;
-        rfile.read((char*) &b, sizeof(int));
-        if (b == 1){
-            vec.push_back(true);
-
-        }
-        else{
-            vec.push_back(false);
-        }
-    }
-    rfile.close();
-    bf_vec = vec;
-//    bf_vec = readVec(filename+"_vec");
-//    std::string line, item, op_string, numElement_str, bitsPerElement_str;
-//    if(std::getline(file, line)){
-//        std::stringstream linestream(line);
-//        std::getline(linestream, numElement_str, ' ');
-//        std::getline(linestream, bitsPerElement_str, ' ');
-//        numElement= stoi(numElement_str);
-//        bitsPerElement= stoi(bitsPerElement_str);
-//        numIndex = (int)floor(0.693*bitsPerElement+ 0.5);
-//        size = numElement * bitsPerElement;
-//        vec.resize(size, 0);
-//    }
-//    if(std::getline(file, line)){
-//        std::stringstream linestream(line);
-//        std::getline(linestream, item);
 //
-//        for (size_t i = 0; i < item.size(); i++)
-//        {
-//            if(item[i] == '0'){
-//                vec.push_back(false);
-//            }else{
-//                vec.push_back(true);
-//            }
+//    std::ifstream rfile(filename, std::ios::binary);
+//    rfile.read((char*) &numElement, sizeof(int));
+//    rfile.read((char*) &bitsPerElement, sizeof(int));
+//    numIndex = (int)floor(0.693*bitsPerElement+ 0.5);
+//    size = numElement * bitsPerElement;
+//    for (int i = 0; i < size; ++i) {
+//        int b;
+//        rfile.read((char*) &b, sizeof(int));
+//        if (b == 1){
+//            vec.push_back(true);
+//
+//        }
+//        else{
+//            vec.push_back(false);
 //        }
 //    }
+//    rfile.close();
+    std::ifstream rfile(filename);
+
+    std::string line, item, op_string, numElement_str, bitsPerElement_str;
+    if(std::getline(rfile, line)){
+        std::stringstream linestream(line);
+        std::getline(linestream, numElement_str);
+        std::getline(rfile, line);
+        std::stringstream linestream2(line);
+        std::getline(linestream2, bitsPerElement_str);
+        numElement= stoi(numElement_str);
+        bitsPerElement= stoi(bitsPerElement_str);
+        numIndex = (int)floor(0.693*bitsPerElement+ 0.5);
+        size = numElement * bitsPerElement;
+    }
+
+    int a = 0;
+    while(std::getline(rfile, line)){
+        std::stringstream linestream(line);
+        std::getline(linestream, item);
+
+        a ++;
+        if(item == "0"){
+            vec.push_back(false);
+        }else{
+            vec.push_back(true);
+        }
+    }
+    bf_vec = vec;
+
 
 }
 
 BloomFilter::BloomFilter(string filename,int numElement_, int bitsPerElement_ ) {
-    load(filename);
     //Find if there exist dt file, if so load
     if (std::filesystem::exists(std::filesystem::path(filename))){
         this->load(filename);
