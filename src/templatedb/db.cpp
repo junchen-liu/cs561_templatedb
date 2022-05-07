@@ -18,7 +18,7 @@ Value DB::get(int key)
     else
         v = disk.search(key);
     int64_t t = deleteTable.getTimeInt(key);
-    if (t > v.timestamp){
+    if (t > v.timestamp){ // compare to check if is deleted in range del
 
         v.visible = false;
     }
