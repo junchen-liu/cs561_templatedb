@@ -10,9 +10,10 @@ class BloomFilter {
 public:
 	BloomFilter();
 	BloomFilter( int numElement_, int bitsPerElement_ );
-	BloomFilter( string filename);
+	BloomFilter( string filename,int numElement_, int bitsPerElement_ );
 	int numElement;
 	int bitsPerElement;
+    string filename;
 
 	void program(string key);
 	bool query(string key);
@@ -30,9 +31,6 @@ private:
 	void getIndex( string key, vector<int>* index );
 
 
-    void writeVec(vector<bool> &map, string filename);
-
-    vector<bool> readVec(string filename);
 };
 
 } // namespace BF

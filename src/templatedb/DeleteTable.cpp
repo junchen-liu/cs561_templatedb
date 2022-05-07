@@ -46,7 +46,7 @@ void DeleteTable::load() {
         std::getline(linestream, timestamp_str, ' '); // Second argument is if visible
         int min_key = stoi(min_str);
         int max_key = stoi(max_str);
-        int64_t t = stol(timestamp_str);
+        int64_t t = stoll(timestamp_str);
 
         vec.emplace_back(min_key,max_key,t);
     }

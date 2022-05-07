@@ -121,3 +121,7 @@ void LevelNonZero::save() const {
     }
     ofs.close();
 }
+
+void LevelNonZero::close() {
+    bf.save(dir+"_bf");
+}

@@ -68,3 +68,11 @@ void DiskStorage::save() const {
     ofs.write((char*) &no, sizeof(uint64_t));
     ofs.close();
 }
+
+void DiskStorage::close() {
+
+    for (auto level : levels)
+    {
+        level.close();
+    }
+}

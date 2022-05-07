@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 #include <map>
+#include "BloomFilter/BloomFilter.h"
 
 class LevelNonZero {
 public:
@@ -16,6 +17,7 @@ public:
     void merge(std::map<int, Value> &&entries1, uint64_t &no);
     void clear();
     uint64_t space() const;
+    void close();
 private:
     std::string dir;
     uint64_t size;
@@ -23,6 +25,7 @@ private:
     uint64_t lastKey;
     std::vector<SSTable> ssts;
     void save() const;
+    BF::BloomFilter bf = BF::BloomFilter(dir+"_bf", 1024, 10); // number of keys, bits per element
 };
 
 #endif

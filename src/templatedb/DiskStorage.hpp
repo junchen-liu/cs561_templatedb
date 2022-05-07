@@ -19,6 +19,7 @@ public:
     Value search(int key);
     std::map<int, Value> search(int min_key, int max_key);
     void clear();
+    void close(); //persistent all the bloomfilters in each lebel
 private:
     std::string dir;
     uint64_t no;

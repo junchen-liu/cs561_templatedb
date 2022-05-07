@@ -224,6 +224,8 @@ bool DB::close()
         file.close();
     }
     deleteTable.close();
+    bf.save(dir+"_bf"); //save the bf for level0 and memory
+    disk.close();//save the bloom filters for other levels
     this->status = CLOSED;
 
     return true;

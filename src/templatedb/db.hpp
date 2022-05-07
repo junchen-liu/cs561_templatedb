@@ -40,6 +40,7 @@ public:
     Value get(int key);
     void put(int key, Value val);
     std::vector<Value> scan();
+
     std::vector<Value> scan(int min_key, int max_key);
     void del(int key);
     void del(int min_key, int max_key);
@@ -52,7 +53,7 @@ public:
 
     std::vector<Value> execute_op(Operation op);
 
-    BloomFilter bf = BloomFilter(1024, 10); // number of keys, bits per element
+
 
 
 private:
@@ -65,7 +66,7 @@ private:
     int max_key;
     bool write_to_file();
     DeleteTable deleteTable;
-
+    BF::BloomFilter bf = BF::BloomFilter(dir+"_bf", 1024, 10); //bloomfilter for level0 and the Memtable
 
 };
 

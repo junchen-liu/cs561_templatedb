@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
 using namespace std;
 using namespace BF;
@@ -135,7 +136,15 @@ void BloomFilter::load(string filename) {
 
 }
 
-BloomFilter::BloomFilter(string filename) {
+BloomFilter::BloomFilter(string filename,int numElement_, int bitsPerElement_ ) {
     load(filename);
+    //Find if there exist dt file, if so load
+    if (std::filesystem::exists(std::filesystem::path(filename))){
+        this->load(filename);
+    }
+    else{
+        BloomFilter( numElement_, bitsPerElement_ );
+    }
+
 }
 
