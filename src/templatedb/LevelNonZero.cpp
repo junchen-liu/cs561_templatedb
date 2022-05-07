@@ -50,7 +50,7 @@ std::map<int, Value> LevelNonZero::search(int min_key, int max_key) const {
     return ret_map;
 }
 
-std::map<int, Value> LevelNonZero::extract() {
+std::map<int, Value> LevelNonZero::extract() { //Merge sort this level
     std::map<int, Value> ret;
     if (Option::LEVELING) {
         auto itr = ssts.begin();

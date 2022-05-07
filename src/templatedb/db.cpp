@@ -8,7 +8,7 @@ using namespace templatedb;
 Value DB::get(int key)
 {
     Value v;
-    if (!bf.query(to_string(key))){
+    if (!bf.query(to_string(key))){ //check bloomfiler for memtbale and level0;
         v.visible = false;
         return v;
     }

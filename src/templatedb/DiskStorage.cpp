@@ -28,15 +28,20 @@ void DiskStorage::add(const std::map<int, Value> &mem) {
     }
     for (uint64_t i = 0; i + 1 < Option::NZ_NUM; ++i)
         if (levels[i].space() > Option::NZ_SPACES[i])
-            levels[i + 1].merge(levels[i].extract(), no);
+            levels[i + 1].merge(levels[i].extract(), no); //append to the next level
     save();
 }
 
 Value DiskStorage::search(int key) {
     Value searchResult = level0.search(key);
     if (!searchResult.visible)
-        for (uint64_t i = 0; !searchResult.visible && i < Option::NZ_NUM; ++i)
+        for (uint64_t i = 0; !searchResult.visible && i < Option::NZ_NUM; ++i){
+            if(!levels[i].bf.query(to_string(key))){ //Check the bloomfilter of this level
+                continue;
+            }
             searchResult = levels[i].search(key);
+        }
+
     return searchResult;
 }
 

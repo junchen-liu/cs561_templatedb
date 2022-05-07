@@ -11,6 +11,7 @@
 
 using namespace std;
 
+//A structure to keep information of when the range was deleted.
 class MinMaxPair
 {
 public:
