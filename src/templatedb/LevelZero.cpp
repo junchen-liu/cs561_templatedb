@@ -18,8 +18,11 @@ LevelZero::LevelZero(const std::string &dir): dir(dir){
         ifs.read((char*) &byteCnt, sizeof(uint64_t));
         for (uint64_t i = 0; i < size; ++i) {
             uint64_t no;
+            int min_key, max_key;
             ifs.read((char*) &no, sizeof(uint64_t));
-            ssts.emplace_back(SSTableId(dir, no));
+            ifs.read((char*) &min_key, sizeof(int));
+            ifs.read((char*) &max_key, sizeof(int));
+            ssts.emplace_back(SSTableId(dir, no), min_key, max_key);
         }
         ifs.close();
     }
@@ -44,19 +47,17 @@ std::map<int, Value> LevelZero::search(int min_key, int max_key) const {
 
 void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
     if (Option::LEVELING) {
-        if (size) {
-            std::map<int, Value> entries = ssts[0].load();
-            std::vector<std::map<int, Value>> v;
-            v.emplace_back(entries);
-            v.emplace_back(mem);
+        ssts.emplace_back(mem, SSTableId(dir, no++));
+        if (ssts.size() > 1) {
+            std::vector<SSTable> newTables = Util::compact(ssts, dir, no);
             clear();
-            ssts.push_back(SSTable(Util::compact(v), SSTableId(dir, no++)));
+            ssts = newTables;
+            size = ssts.size();
+            byteCnt = 0;
+            for (const auto &t: ssts)
+                byteCnt += t.getSpace();
+            save();
         }
-        else {
-            ssts.emplace_back(mem, SSTableId(dir, no++));
-        }
-        byteCnt = ssts[0].getSpace();
-        size = 1;
     }
     else {
         ssts.emplace_back(mem, SSTableId(dir, no++));
@@ -72,12 +73,12 @@ std::map<int, Value> LevelZero::extract() {
         t = ssts[0].load();
     }
     else {
-        std::vector<std::map<int, Value>> inputs;
-        for (const SSTable &sst: ssts) {
-            inputs.emplace_back(sst.load());
-            sst.remove();
-        }
-        t = Util::compact(inputs);
+//        std::vector<std::map<int, Value>> inputs;
+//        for (const SSTable &sst: ssts) {
+//            inputs.emplace_back(sst.load());
+//            sst.remove();
+//        }
+//        t = Util::compact(inputs);
     }
     clear();
     save();
@@ -105,6 +106,8 @@ void LevelZero::save() const {
     for (const SSTable &sst : ssts) {
         uint64_t no = sst.number();
         ofs.write((char*) &no, sizeof(uint64_t));
+        ofs.write((char*) &sst.min_key, sizeof(int));
+        ofs.write((char*) &sst.max_key, sizeof(int));
     }
     ofs.close();
 }

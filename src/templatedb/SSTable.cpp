@@ -2,9 +2,9 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+#include <utility>
 #include <vector>
 
-#include <iostream>
 #include <string>
 
 using std::ofstream;
@@ -12,33 +12,39 @@ using std::ifstream;
 
 
 SSTable::SSTable(const SSTableId &id)
-    : sstbId(id){
+    : SSTable(id, INT_MAX, INT_MAX) {
 }
 
-SSTable::SSTable(const std::map<int, Value> &entries, const SSTableId &id)
-    : sstbId(id),space(entries.size()){
+SSTable::SSTable(SSTableId id, int min, int max)
+        : sstbId(std::move(id)), min_key(min), max_key(max), space(0) {
+}
+
+SSTable::SSTable(const std::map<int, Value> &entries, SSTableId id)
+    : sstbId(std::move(id)), space(int(entries.size())), min_key(entries.begin()->first), max_key(entries.rbegin()->first) {
     save(entries);
 }
 
 
 Value SSTable::search(int key) const {
-    std::map<int, Value> entries = load();
-    if (entries.count(key)) {
-        return entries[key];
+    if (min_key <= key && max_key >= key) {
+        std::map<int, Value> entries = load();
+        if (entries.count(key)) {
+            return entries[key];
+        }
     }
-    return Value(false);
+    return {false};
 }
 
-std::map<int, Value> SSTable::search(int min_key, int max_key) const {
-    std::map<int, Value> entries = load();
+std::map<int, Value> SSTable::search(int min, int max) const {
     std::map<int, Value> ret;
-    int sst_min = entries.begin()->first;
-    int sst_max = entries.rbegin()->first;
-    if (sst_min >= min_key || sst_max <= max_key) {
-        auto lower = entries.lower_bound(min_key);
-        auto upper = entries.upper_bound(max_key);
-        for (auto it = lower; it != upper; ++it) {
-            ret[it->first] = it->second;
+    if (min_key >= min || max_key <= max) {
+        std::map<int, Value> entries = load();
+        if (min_key >= min || max_key <= max) {
+            auto lower = entries.lower_bound(min);
+            auto upper = entries.upper_bound(max);
+            for (auto it = lower; it != upper; ++it) {
+                ret[it->first] = it->second;
+            }
         }
     }
     return ret;
@@ -86,6 +92,10 @@ int SSTable::getSpace() const {
     return space;
 }
 
+void SSTable::setSpace(int s) {
+    space = s;
+}
+
 void SSTable::remove() const {
     std::filesystem::remove(std::filesystem::path(sstbId.name()));
 }
@@ -96,6 +106,8 @@ uint64_t SSTable::number() const {
 
 void SSTable::save(const std::map<int, Value> &entries) {
     std::ofstream file(sstbId.name());
+    min_key = entries.begin()->first;
+    max_key = entries.rbegin()->first;
     for (const auto &i : entries) {
         file << i.first << ' ';
         if(i.second.visible){
@@ -109,4 +121,5 @@ void SSTable::save(const std::map<int, Value> &entries) {
         }
         file << std::endl;
     }
+    file.close();
 }

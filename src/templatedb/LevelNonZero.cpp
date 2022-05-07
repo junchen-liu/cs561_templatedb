@@ -23,8 +23,11 @@ LevelNonZero::LevelNonZero(const std::string &dir): dir(dir) {
         ifs.read((char*) &lastKey, sizeof(uint64_t));
         for (uint64_t i = 0; i < size; ++i) {
             uint64_t no;
+            int min_key, max_key;
             ifs.read((char*) &no, sizeof(uint64_t));
-            ssts.emplace_back(SSTableId(dir, no));
+            ifs.read((char*) &min_key, sizeof(int));
+            ifs.read((char*) &max_key, sizeof(int));
+            ssts.emplace_back(SSTableId(dir, no), min_key, max_key);
         }
         ifs.close();
     }
@@ -55,12 +58,12 @@ std::map<int, Value> LevelNonZero::extract() {
         clear();
     }
     else {
-        std::vector<std::map<int, Value>> inputs;
-        for (const SSTable &sst: ssts) {
-            inputs.emplace_back(sst.load());
-            sst.remove();
-        }
-        ret = Util::compact(inputs);
+//        std::vector<std::map<int, Value>> inputs;
+//        for (const SSTable &sst: ssts) {
+//            inputs.emplace_back(sst.load());
+//            sst.remove();
+//        }
+//        ret = Util::compact(inputs);
     }
     save();
     return ret;
@@ -68,19 +71,19 @@ std::map<int, Value> LevelNonZero::extract() {
 
 void LevelNonZero::merge(std::map<int, Value> &&entries1, uint64_t &no) {
     if (Option::LEVELING) {
-        if (size) {
-            std::map<int, Value> entries = ssts.begin()->load();
-            std::vector<std::map<int, Value>> v;
-            v.emplace_back(entries);
-            v.emplace_back(entries1);
-            clear();
-            ssts.insert(ssts.begin(), SSTable(Util::compact(v), SSTableId(dir, no++)));
-        }
-        else {
-            ssts.emplace_back(entries1, SSTableId(dir, no++));
-        }
-        byteCnt = ssts.begin()->getSpace();
-        size = 1;
+//        if (size) {
+//            std::map<int, Value> entries = ssts.begin()->load();
+//            std::vector<std::map<int, Value>> v;
+//            v.emplace_back(entries);
+//            v.emplace_back(entries1);
+//            clear();
+//            ssts.insert(ssts.begin(), SSTable(Util::compact(v), SSTableId(dir, no++)));
+//        }
+//        else {
+//            ssts.emplace_back(entries1, SSTableId(dir, no++));
+//        }
+//        byteCnt = ssts.begin()->getSpace();
+//        size = 1;
     }
     else {
         ssts.emplace_back(entries1, SSTableId(dir, no++));
@@ -113,6 +116,8 @@ void LevelNonZero::save() const {
     for (const SSTable &sst : ssts) {
         uint64_t no = sst.number();
         ofs.write((char*) &no, sizeof(uint64_t));
+        ofs.write((char*) &sst.min_key, sizeof(int));
+        ofs.write((char*) &sst.max_key, sizeof(int));
     }
     ofs.close();
 }

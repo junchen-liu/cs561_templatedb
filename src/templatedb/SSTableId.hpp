@@ -5,9 +5,9 @@
 
 struct SSTableId {
     std::string dir;
-    int no;
+    uint64_t no;
     SSTableId() = default;
-    SSTableId(const std::string &dir, int no);
+    SSTableId(const std::string &dir, uint64_t no);
     std::string name() const;
 };
 
