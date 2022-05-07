@@ -5,32 +5,39 @@
 
 using namespace templatedb;
 
+// Get one value from db.
 Value DB::get(int key)
 {
     Value v;
-    if (!bf.query(to_string(key))){ //check bloomfiler for memtbale and level0;
+    // Check bloomfiler for memtbale and level0;
+    if (!bf.query(to_string(key))) {
         v.visible = false;
         return v;
     }
 
+    // If key is in memory table.
     if (table.count(key))
         v = table[key];
     else
         v = disk.search(key);
     int64_t t = deleteTable.getTimeInt(key);
-    if (t > v.timestamp){ // compare to check if is deleted in range del
-
+    // Compare to check if is deleted using range del.
+    if (t > v.timestamp) {
         v.visible = false;
     }
 	return v;
 }
 
-
+// Insert a value to db.
 void DB::put(int key, Value val)
 {
+    // Put key in bloomfilter.
     bf.program(to_string(key));
 
+    min_key = std::min(key, min_key);
+    max_key = std::max(key, max_key);
     table[key] = std::move(val);
+    // Merge memory table to level 0 if memory table is full. (Further merge in disk.add() function)
     if (table.size() >= Option::MEM_SPACE) {
 		disk.add(table);
 		table.clear();
@@ -39,23 +46,28 @@ void DB::put(int key, Value val)
 }
 
 
+// Scan every entry in the db.
 std::vector<Value> DB::scan()
 {
     return scan(min_key, max_key);
 }
 
 
+// Scan for value in a range of keys.
 std::vector<Value> DB::scan(int min_key, int max_key)
 {
     std::map<int, Value> return_map;
     std::vector<Value> return_vector;
 
+    // Search memory table.
     for (auto pair: table)
     {
         if ((pair.first >= min_key) && (pair.first <= max_key))
             return_map[pair.first] = pair.second;
     }
+    // Search disk.
     return_map.merge(disk.search(min_key, max_key));
+    // Search delete table to remove deleted keys.
     for (auto & it : return_map) {
         unsigned long int t = deleteTable.getTimeInt(it.first);
         if (t <= it.second.timestamp && it.second.visible){
@@ -65,7 +77,7 @@ std::vector<Value> DB::scan(int min_key, int max_key)
     return return_vector;
 }
 
-
+// Put a tombstone for single key deletion.
 void DB::del(int key)
 {
     if (table.count(key))
@@ -76,19 +88,21 @@ void DB::del(int key)
     
 }
 
-
+// Insert to delete table for range deletion.
 void DB::del(int min_key, int max_key)
 {
     deleteTable.del(min_key,max_key);
 }
 
-
+// Return size of memory table.
 size_t DB::size()
 {
     return table.size();
 }
 
-
+/* --------------------
+ * No change under
+ * -------------------- */
 std::vector<Value> DB::execute_op(Operation op)
 {
     std::vector<Value> results;

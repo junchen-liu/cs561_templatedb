@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-
+// Check for existing data and create directory if it doesn't exist.
 LevelNonZero::LevelNonZero(const std::string &dir): dir(dir), bf(dir+"_bf", 1024, 10) {
     if (!std::filesystem::exists(std::filesystem::path(dir))) {
         std::filesystem::create_directories(std::filesystem::path(dir));
@@ -54,8 +54,9 @@ std::vector<SSTable> LevelNonZero::extract(uint64_t &no) {
     return ssts;
 }
 
+// Merge higher level to this level.
 void LevelNonZero::merge(std::vector<SSTable> upper, uint64_t &no) {
-    if (Option::LEVELING) {
+    if (Option::LEVELING) { // Leveling
         ssts.insert(std::end(ssts), std::begin(upper), std::end(upper));
         if (ssts.size() > 1) {
             std::vector<SSTable> newTables = Util::compact(ssts, dir, no, &bf);
@@ -67,7 +68,7 @@ void LevelNonZero::merge(std::vector<SSTable> upper, uint64_t &no) {
                 byteCnt += t.getSpace();
         }
     }
-    else {
+    else {  // Tiering
         upper = Util::compact(upper, dir, no, &bf);
         ssts.insert(std::end(ssts), std::begin(upper), std::end(upper));
         size = ssts.size();

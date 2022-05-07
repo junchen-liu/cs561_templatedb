@@ -7,6 +7,7 @@
 
 DiskStorage::DiskStorage() : DiskStorage("./diskdata") {}
 
+// Check for existing data and create directory if it doesn't exist.
 DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option::Z_NAME) {
     if (std::filesystem::exists(std::filesystem::path(dir + "/meta"))) {
         std::ifstream ifs(dir + "/meta", std::ios::binary);
@@ -16,18 +17,21 @@ DiskStorage::DiskStorage(const std::string &dir): dir(dir), level0(dir + Option:
         no = 0;
         save();
     }
+    // Create levels.
     for (uint64_t i = 0; i < Option::NZ_NUM; ++i)
         levels.emplace_back(dir + Option::NZ_NAMES[i]);
 }
 
+// Push memory table to disk.
 void DiskStorage::add(const std::map<int, Value> &mem) {
     level0.add(mem, no);
-    //Compaction
+    // Compact and merge to lv1 if lv0 is full
     if (level0.space() >= Option::Z_SPACE){
         levels[0].merge(level0.extract(no), no);
         level0.clear();
         level0.save();
     }
+    // Loop through to merge.
     for (uint64_t i = 0; i + 1 < Option::NZ_NUM; ++i)
         if (levels[i].space() >= Option::NZ_SPACES[i]) {
             levels[i + 1].merge(levels[i].extract(no), no); //append to the next level
@@ -37,6 +41,7 @@ void DiskStorage::add(const std::map<int, Value> &mem) {
     save();
 }
 
+// Single search
 Value DiskStorage::search(int key) {
     Value searchResult = level0.search(key);
     if (!searchResult.visible)
@@ -50,13 +55,17 @@ Value DiskStorage::search(int key) {
     return searchResult;
 }
 
+// Range search
 std::map<int, Value> DiskStorage::search(int min_key, int max_key) {
     std::map<int, Value> ret_map;
     ret_map.merge(level0.search(min_key, max_key));
+
+    // Search lower level first
     for (auto lv : levels) {
         std::map<int, Value> v = lv.search(min_key, max_key);
         ret_map.merge(v);
     }
+    // Then update with current level newer entries.
     for (auto it = ret_map.cbegin(); it != ret_map.cend();)
         if (!it->second.visible)
             ret_map.erase(it++);
@@ -65,6 +74,7 @@ std::map<int, Value> DiskStorage::search(int min_key, int max_key) {
     return ret_map;
 }
 
+// Clear the whole database.
 void DiskStorage::clear() {
     level0.clear();
     for (uint64_t i = 0; i < Option::NZ_NUM; ++i)
@@ -73,6 +83,7 @@ void DiskStorage::clear() {
     save();
 }
 
+// Save metadata.
 void DiskStorage::save() const {
     std::ofstream ofs(dir + "/meta", std::ios::binary);
     ofs.write((char*) &no, sizeof(uint64_t));

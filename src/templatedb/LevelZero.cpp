@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iostream>
 
+
+// Check for existing data and create directory if it doesn't exist.
 LevelZero::LevelZero(const std::string &dir): dir(dir){
     if (!std::filesystem::exists(std::filesystem::path(dir))) {
         std::filesystem::create_directories(std::filesystem::path(dir));
@@ -45,8 +47,9 @@ std::map<int, Value> LevelZero::search(int min_key, int max_key) const {
     return ret_map;
 }
 
+// Add memory table to lv0.
 void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
-    if (Option::LEVELING) {
+    if (Option::LEVELING) { // Leveling
         ssts.emplace_back(mem, SSTableId(dir, no++));
         if (ssts.size() > 1) {
             std::vector<SSTable> newTables = Util::compact(ssts, dir, no, nullptr);
@@ -59,7 +62,7 @@ void LevelZero::add(const std::map<int, Value> &mem, uint64_t &no) {
             save();
         }
     }
-    else {
+    else {  // Tiering
         ssts.emplace_back(mem, SSTableId(dir, no++));
         ++size;
         byteCnt += mem.size();

@@ -15,6 +15,8 @@
 typedef std::pair<std::string, int> pi;
 
 namespace Util {
+
+    // Get first integer from string, which is the key.
     inline int getKey(const std::string& s) {
         std::stringstream stream(s);
         std::string _key;
@@ -23,6 +25,7 @@ namespace Util {
         return key;
     }
 
+    // Comparison for heap. First compare key, if keys are same, larger index means later insertion time.
     struct comp {
         constexpr bool operator() (pi const& a, pi const& b) const noexcept {
             int keya = getKey(a.first);
@@ -55,8 +58,9 @@ namespace Util {
             // First element is key, second is the table it from.
             heap.push(std::make_pair(line, i));
         }
-        // Flag indicates if all tables are looped to the end.
+
         while (!heap.empty()) {
+            // Create new sstable if previous one is full.
             if (size == 0) {
                 file.close();
                 SSTable t(SSTableId(dir, no++));
@@ -65,6 +69,7 @@ namespace Util {
             }
             pi cur = heap.top();
             int key = getKey(cur.first);
+            // Write to file
             if (key != previous_min) {
                 if (bf != nullptr)
                     bf->program(std::to_string(key));
